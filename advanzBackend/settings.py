@@ -66,6 +66,10 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173',
+    
+]
 
 ROOT_URLCONF = 'advanzBackend.urls'
 

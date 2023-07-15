@@ -1,11 +1,11 @@
 from django.urls import path
-from .views import UserAccountAPIView,CreateDoctorAPIView
+from .views import GetAllUserAPIView,CreateDoctorAPIView
 
 
 
 urlpatterns = [
 
    
-    path('api/me/', UserAccountAPIView.as_view()),
+    path('api/get/users/', GetAllUserAPIView.as_view()),
     path('api/doctors/create/', CreateDoctorAPIView.as_view()),
 ]

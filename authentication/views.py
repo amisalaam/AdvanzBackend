@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView
-from .serializers import UserCreateSerializer,YourModelSerializer,DoctorCreateSerializer
+from .serializers import UserCreateSerializer,GetAllUserSerializer,DoctorCreateSerializer
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import UserAccount
@@ -20,10 +20,10 @@ def Login(request):
 
 
 
-class UserAccountAPIView(APIView):
+class GetAllUserAPIView(APIView):
     def get(self, request):
         user = request.user
-        serializer = YourModelSerializer(user)
+        serializer = GetAllUserSerializer(user)
         return Response(serializer.data)
 
 

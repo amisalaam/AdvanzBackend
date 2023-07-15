@@ -12,7 +12,7 @@ class UserCreateSerializernew(UserCreateSerializer):
         
 
 
-class YourModelSerializer(serializers.ModelSerializer):
+class GetAllUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
         fields = ('id','email','name','is_superuser','is_doctor','is_staff','is_active')
