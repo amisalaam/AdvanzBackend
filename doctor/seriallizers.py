@@ -36,7 +36,7 @@ class GetSlotsListSerializer(serializers.ModelSerializer):
 class UpdateSlotsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slots
-        fields ='__all__'
+        fields =['is_booked']
 
         
 

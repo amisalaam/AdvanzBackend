@@ -55,6 +55,12 @@ class Appointment(models.Model):
     status = models.CharField(max_length=10,choices= STATUS_CHOICES,default='Pending')
     slot = models.ForeignKey(Slots,on_delete=models.CASCADE)
     
+class BookingNotification(models.Model):
+    message = models.CharField(max_length=255)
+    recipient = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False)
+
+    
     
 
 

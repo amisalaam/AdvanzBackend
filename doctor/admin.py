@@ -12,6 +12,7 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Doctor)
+
 admin.site.register(Department)
 admin.site.register(Slots, SlotsAdmin)
 admin.site.register(Appointment,AppointmentAdmin)

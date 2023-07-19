@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import datetime
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
 from .seriallizers import DoctorGetDetailsSerializer, CreateSlotsSerializer,GetSlotsListSerializer,GetSingleDoctorSerializer,UpdateSlotsListSerializer
 from .models import Doctor, Department, Slots
@@ -91,13 +93,22 @@ class GetSlotsListAPIView(APIView):
         return Response(serializer.data)
 
 class UpdateSlotListAPIView(APIView):
-    permission_classes =[]
+    permission_classes = []
 
-    def put(self, request, slot_id):
+    def put(self, request, slot_id, doctor_id):
         instance = get_object_or_404(Slots, id=slot_id)
         serializer = UpdateSlotsListSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        # Send a notification to the doctor using channels
+        channel_layer = get_channel_layer()
+        notification = {
+            'type': 'slot_booked',
+            'message': f'Slot {slot_id} has been booked!',
+        }
+        async_to_sync(channel_layer.group_send)(f'doctor_{doctor_id}', notification)
+
         return Response(serializer.data)
 
 
