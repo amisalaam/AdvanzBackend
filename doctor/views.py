@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import datetime
+
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
@@ -105,9 +106,12 @@ class UpdateSlotListAPIView(APIView):
         channel_layer = get_channel_layer()
         notification = {
             'type': 'slot_booked',
-            'message': f'Slot {slot_id} has been booked!',
+            'message': f'Slot {slot_id} has been booked by user{request.user}!',
         }
         async_to_sync(channel_layer.group_send)(f'doctor_{doctor_id}', notification)
+
+        # Send a notification to the superuser using channels
+        async_to_sync(channel_layer.group_send)('superuser_group', notification)
 
         return Response(serializer.data)
 
