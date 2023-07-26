@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Doctor,Slots
+from .models import Doctor,Slots,Booking_Notification
 
 
 
@@ -37,6 +37,12 @@ class UpdateSlotsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slots
         fields =['is_booked']
+        
+
+class BookingNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking_Notification
+        fields = '__all__'
 
         
 

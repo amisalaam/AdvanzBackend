@@ -57,5 +57,6 @@ class SuperuserNotificationConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
             'type': 'notification',
             'message': message,
+            
         }))
 

@@ -55,10 +55,16 @@ class Appointment(models.Model):
     status = models.CharField(max_length=10,choices= STATUS_CHOICES,default='Pending')
     slot = models.ForeignKey(Slots,on_delete=models.CASCADE)
     
-class BookingNotification(models.Model):
-    message = models.CharField(max_length=255)
-    recipient = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    is_read = models.BooleanField(default=False)
+class Booking_Notification(models.Model):
+    send_by = models.ForeignKey(UserAccount,on_delete=models.CASCADE)
+    sent_to = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    message = models.CharField(max_length=555)
+    is_seen = models.BooleanField(default=False)
+    time = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.send_by.name}: {self.message}"
+    
 
     
     

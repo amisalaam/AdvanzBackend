@@ -2,11 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import datetime
-
+from rest_framework.permissions import IsAuthenticated
+from .models import Booking_Notification
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
-from .seriallizers import DoctorGetDetailsSerializer, CreateSlotsSerializer,GetSlotsListSerializer,GetSingleDoctorSerializer,UpdateSlotsListSerializer
+from .seriallizers import *
 from .models import Doctor, Department, Slots
 from authentication.models import UserAccount
 from django.db.models import Q
@@ -15,6 +16,7 @@ from django.db.models import Q
 
 class GetDoctorListAPIView(APIView):
     permission_classes = []
+
     def get(self, request):
         doctor = Doctor.objects.all()
         print(doctor)
@@ -27,12 +29,13 @@ class GetDoctorListAPIView(APIView):
 
         return Response(serialized_data)
 
+
 class GetSingleDoctorAPIView(APIView):
     permission_classes = []
 
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user_id=doctor_id)
-        print (doctor)
+        print(doctor)
         serializer = GetSingleDoctorSerializer(doctor)
         serialized_data = serializer.data
 
@@ -43,11 +46,12 @@ class GetSingleDoctorAPIView(APIView):
 
         return Response(serialized_data)
 
+
 class CreateSlotsAPIView(APIView):
     permission_classes = []
-    
+
     def post(self, request):
-        
+
         serializer = CreateSlotsSerializer(data=request.data)
         valid = serializer.is_valid()
         if valid:
@@ -58,31 +62,33 @@ class CreateSlotsAPIView(APIView):
             slot_duration = int(serializer.validated_data['slot_duration'])
 
             overlapping_slots = Slots.objects.filter(Q(date=date) & (
-                Q(start_time__lt=start_time, end_time__gt=start_time) | 
-                Q(start_time__lt=end_time, end_time__gt=end_time) | 
+                Q(start_time__lt=start_time, end_time__gt=start_time) |
+                Q(start_time__lt=end_time, end_time__gt=end_time) |
                 Q(start_time__gte=start_time, end_time__lte=end_time)
-                ))
+            ))
             if overlapping_slots.exists():
-                return Response({'error':'Slots overlaps with existing slots'},status = status.HTTP_400_BAD_REQUEST)
-            
+                return Response({'error': 'Slots overlaps with existing slots'}, status=status.HTTP_400_BAD_REQUEST)
+
             slots = []
             current_time = start_time
-            slot_count = (datetime.datetime.combine(date,end_time)-datetime.datetime.combine(date,start_time))//datetime.timedelta(minutes=slot_duration)
+            slot_count = (datetime.datetime.combine(date, end_time)-datetime.datetime.combine(
+                date, start_time))//datetime.timedelta(minutes=slot_duration)
             for _ in range(slot_count):
-                slot =Slots(
+                slot = Slots(
                     doctor=doctor,
-                    date = date,
-                    start_time = current_time,
-                    end_time=(datetime.datetime.combine(date,current_time)+datetime.timedelta(minutes=slot_duration)).time(),
-                    status = True,
-                    slot_duration = slot_duration
-                    )
+                    date=date,
+                    start_time=current_time,
+                    end_time=(datetime.datetime.combine(
+                        date, current_time)+datetime.timedelta(minutes=slot_duration)).time(),
+                    status=True,
+                    slot_duration=slot_duration
+                )
                 slots.append(slot)
-                current_time = (datetime.datetime.combine(date,current_time)+datetime.timedelta(minutes=slot_duration)).time()
+                current_time = (datetime.datetime.combine(
+                    date, current_time)+datetime.timedelta(minutes=slot_duration)).time()
             Slots.objects.bulk_create(slots)
-            return Response(serializer.data,status = status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetSlotsListAPIView(APIView):
@@ -93,12 +99,14 @@ class GetSlotsListAPIView(APIView):
         serializer = GetSlotsListSerializer(slots, many=True)
         return Response(serializer.data)
 
+
 class UpdateSlotListAPIView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, slot_id, doctor_id):
         instance = get_object_or_404(Slots, id=slot_id)
-        serializer = UpdateSlotsListSerializer(instance, data=request.data, partial=True)
+        serializer = UpdateSlotsListSerializer(
+            instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -106,16 +114,35 @@ class UpdateSlotListAPIView(APIView):
         channel_layer = get_channel_layer()
         notification = {
             'type': 'slot_booked',
-            'message': f'Slot {slot_id} has been booked by user{request.user}!',
+            'message': f'Slot {slot_id} has been booked by user {request.user}!',
+
         }
-        async_to_sync(channel_layer.group_send)(f'doctor_{doctor_id}', notification)
+        async_to_sync(channel_layer.group_send)(
+            f'doctor_{doctor_id}', notification)
 
         # Send a notification to the superuser using channels
-        async_to_sync(channel_layer.group_send)('superuser_group', notification)
+        async_to_sync(channel_layer.group_send)(
+            'superuser_group', notification)
+
+        # Save the booking notification to the database
+        booking_notification = Booking_Notification.objects.create(
+            # Assuming request.user is the sender (UserAccount instance)
+            send_by=request.user,
+            # Fetch the Doctor instance by ID
+            sent_to=get_object_or_404(Doctor, user_id=doctor_id),
+            message=notification['message'],
+            is_seen=False  # Assuming the default value for is_seen is False
+        )
 
         return Response(serializer.data)
 
 
 
+    
+class DoctorBookinNotificationAPiView(APIView):
+    permission_classes = []
 
-            
+    def get(self, request, doctor_id):
+        objects = Booking_Notification.objects.filter(sent_to_id=doctor_id)
+        serializer = BookingNotificationSerializer(objects, many=True)  
+        return Response(serializer.data)
