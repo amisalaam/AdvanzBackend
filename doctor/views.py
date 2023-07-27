@@ -140,9 +140,22 @@ class UpdateSlotListAPIView(APIView):
 
     
 class DoctorBookinNotificationAPiView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, doctor_id):
-        objects = Booking_Notification.objects.filter(sent_to_id=doctor_id)
+        objects = Booking_Notification.objects.filter(sent_to_id=doctor_id).order_by('-time')
         serializer = BookingNotificationSerializer(objects, many=True)  
         return Response(serializer.data)
+    
+    
+class AdminBookingNotificationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    
+    def get(self,request):
+        if request.user.is_superuser:
+            objects = Booking_Notification.objects.all().order_by('-time')
+            serializers = BookingNotificationSerializer(objects,many = True)
+            return Response(serializers.data)
+        else:
+            pass

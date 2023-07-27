@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView
+
 from .serializers import UserCreateSerializer,GetAllUserSerializer,DoctorCreateSerializer
 from django.shortcuts import render
 from django.http import HttpResponse
