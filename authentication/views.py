@@ -1,5 +1,5 @@
 
-from .serializers import UserCreateSerializer,GetAllUserSerializer,DoctorCreateSerializer
+from .serializers import GetAllUserSerializer
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import UserAccount
@@ -28,14 +28,5 @@ class GetAllUserAPIView(APIView):
 
 
 
-class CreateDoctorAPIView(APIView):
-    permission_classes = []  # Allow unauthenticated requests
 
-    def post(self, request):
-        serializer = DoctorCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 

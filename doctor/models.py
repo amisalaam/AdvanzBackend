@@ -17,12 +17,11 @@ class Department(models.Model):
 class DoctorManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(user__is_doctor=True)
-
+ 
 class Doctor(models.Model):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, primary_key=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     doctor_profile_image = models.ImageField(upload_to='images/doctor/profiles/', blank=True, null=True)
-
     objects = models.Manager()  # Default manager
     doctors = DoctorManager()
     

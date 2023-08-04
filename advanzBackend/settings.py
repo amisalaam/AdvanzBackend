@@ -195,6 +195,7 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
+    'USER_AUTHENTICATION': 'authentication.UserAccount',
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
