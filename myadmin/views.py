@@ -4,6 +4,7 @@ from doctor.models import Doctor
 from rest_framework.views import APIView
 from django.db import transaction
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from .serializers import *
@@ -26,17 +27,19 @@ class CreateNewDoctorAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class GetAllDoctorAPIView(APIView):
-    permission_classes= []
-    
-    def get(self,request):
+    permission_classes = []
+
+    def get(self, request):
         objects = Doctor.objects.all()
-        serializers = GetAllDoctorsSerializers(objects,many = True)
+        serializers = GetAllDoctorsSerializers(objects, many=True)
         return Response(serializers.data)
-    
+
+
 class CreateDoctorAPIView(APIView):
-    permission_classes = []  # Allow unauthenticated requests
+    permission_classes = []  
 
     def post(self, request):
         serializer = DoctorCreateSerializer(data=request.data)
@@ -45,49 +48,45 @@ class CreateDoctorAPIView(APIView):
                 user = serializer.save()
                 return Response({'message': 'Doctor account created successfully.'}, status=status.HTTP_201_CREATED)
             else:
-                # If there are validation errors, return them as part of the response
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            # Catch any unexpected exceptions and return a generic error response
             return Response({'message': 'An error occurred while creating the doctor account.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 class GetAllUsersAPIView(APIView):
     permission_classes = []
 
     def get(self, request):
         try:
-            objects = UserAccount.objects.filter(is_superuser=False, is_doctor=False)
+            objects = UserAccount.objects.filter(
+                is_superuser=False, is_doctor=False)
             serializers = GetAllUsersSerializer(objects, many=True)
             return Response(serializers.data, status=status.HTTP_200_OK)
         except Exception as e:
-            # Catch any unexpected exceptions and return a generic error response
             return Response({'message': 'An error occurred while fetching user data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetAllDepartmentAPIView(APIView):
     permission_classes = []
-    
-    def get(self,request):
+
+    def get(self, request):
         try:
             objects = Department.objects.all()
-            serializers = GetAllDepartmentSerializer(objects,many=True)
-            return Response(serializers.data , status = status.HTTP_200_OK)
+            serializers = GetAllDepartmentSerializer(objects, many=True)
+            return Response(serializers.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response ({"message": 'An error occured while fecthing department data'}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response({"message": 'An error occured while fecthing department data'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class DeleteDoctorAPIView(APIView):
     permission_classes = []
-    
+
     def delete(self, request, doctor_id):
         try:
             with transaction.atomic():
-                # Get the user account and associated doctor record
                 user = UserAccount.objects.get(id=doctor_id)
                 doctor = Doctor.objects.get(user=user)
 
-                # Delete the doctor and user in a transaction
                 doctor.delete()
                 user.delete()
 
@@ -101,10 +100,11 @@ class DeleteDoctorAPIView(APIView):
 
         except Exception as e:
             return Response({'message': 'An error occurred while deleting the doctor account.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class DoctorProfileEditView(APIView):
+
+
+class EditDoctorProfileView(APIView):
     permission_classes = []
-    
+
     def get_user_and_doctor(self, doctor_id):
         try:
             user = UserAccount.objects.get(pk=doctor_id)
@@ -122,8 +122,10 @@ class DoctorProfileEditView(APIView):
         if not user:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        user_serializer = EditDoctorUserAccountSerializer(user, data=request.data, partial=True)
-        doctor_serializer = EditDoctorSerializer(doctor, data=request.data, partial=True) if doctor else None
+        user_serializer = EditDoctorUserAccountSerializer(
+            user, data=request.data, partial=True)
+        doctor_serializer = EditDoctorSerializer(
+            doctor, data=request.data, partial=True) if doctor else None
 
         if user_serializer.is_valid():
             user_instance = user_serializer.save()
@@ -134,10 +136,46 @@ class DoctorProfileEditView(APIView):
             if doctor_serializer.is_valid():
                 doctor_serializer.save()
             else:
-                
+
                 return Response(doctor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({
             'user': EditDoctorUserAccountSerializer(user_instance).data,
             'doctor': EditDoctorSerializer(doctor).data if doctor else None
         })
+        
+        
+class BlockUsersView(APIView):
+    permission_classes = []
+    
+    def patch(self, request, user_id):
+        try:
+            user = get_object_or_404(UserAccount, id=user_id, is_doctor=False)
+            user.is_active = not user.is_active  
+            user.save()
+            
+            if user.is_active:
+                message = 'User is now active.'
+            else:
+                message = 'User is now blocked.'
+            
+            return Response({'message': message}, status=status.HTTP_200_OK)
+
+        except UserAccount.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
+    
+class GetBookedSlotsAPIView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        try:
+            booked_slots = Slots.objects.filter(is_booked=True)
+            serializer = BookedSlotSerializer(booked_slots, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
