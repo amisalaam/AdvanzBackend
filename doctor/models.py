@@ -50,6 +50,8 @@ class Appointment(models.Model):
     STATUS_CHOICES =(('pending','Pending'),
                      ('approved','Approved'),
                      ('completed','Completed'),
+                     ('rejected','Rejected'),
+                     
                      )
     status = models.CharField(max_length=10,choices= STATUS_CHOICES,default='Pending')
     slot = models.ForeignKey(Slots,on_delete=models.CASCADE)

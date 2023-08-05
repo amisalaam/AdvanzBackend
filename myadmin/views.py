@@ -174,8 +174,8 @@ class GetBookedSlotsAPIView(APIView):
 
     def get(self, request):
         try:
-            booked_slots = Slots.objects.filter(is_booked=True)
-            serializer = BookedSlotSerializer(booked_slots, many=True)
+            slots = Slots.objects.all()
+            serializer = BookedSlotSerializer(slots, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

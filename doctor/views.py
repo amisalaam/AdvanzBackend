@@ -2,13 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import datetime
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Booking_Notification
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
 from .seriallizers import *
-from .models import Doctor, Department, Slots
+from .models import Doctor, Department, Slots,Appointment
 from authentication.models import UserAccount
 from django.db.models import Q
 # Create your views here.
@@ -95,46 +95,60 @@ class GetSlotsListAPIView(APIView):
     permission_classes = []
 
     def get(self, request, doctor_id):
-        slots = Slots.objects.filter(doctor=doctor_id).order_by('id')
-        serializer = GetSlotsListSerializer(slots, many=True)
+        object = Slots.objects.filter(doctor=doctor_id).order_by('id')
+        serializer = GetSlotsListSerializer(object, many=True)
         return Response(serializer.data)
+
+
 
 
 class UpdateSlotListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, slot_id, doctor_id):
-        instance = get_object_or_404(Slots, id=slot_id)
+        slot_instance = get_object_or_404(Slots, id=slot_id)
         serializer = UpdateSlotsListSerializer(
-            instance, data=request.data, partial=True)
+            slot_instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
 
-        # Send a notification to the doctor using channels
-        channel_layer = get_channel_layer()
-        notification = {
-            'type': 'slot_booked',
-            'message': f'Slot {slot_id} has been booked by user {request.user}!',
+        # Check if the slot is available for booking
+        if not slot_instance.is_booked:
+            # Mark the slot as booked
+            serializer.save(is_booked=True)
 
-        }
-        async_to_sync(channel_layer.group_send)(
-            f'doctor_{doctor_id}', notification)
+            # Create an appointment record for the booking
+            appointment = Appointment.objects.create(
+                patient=request.user,
+                doctor=slot_instance.doctor,
+                status='approved',  # You can set the status according to your logic
+                slot=slot_instance
+            )
 
-        # Send a notification to the superuser using channels
-        async_to_sync(channel_layer.group_send)(
-            'superuser_group', notification)
+            # Send a notification to the doctor using channels
+            channel_layer = get_channel_layer()
+            notification = {
+                'type': 'slot_booked',
+                'message': f'Slot {slot_id} has been booked by user {request.user}!',
+            }
+            async_to_sync(channel_layer.group_send)(
+                f'doctor_{doctor_id}', notification)
 
-        # Save the booking notification to the database
-        booking_notification = Booking_Notification.objects.create(
-            # Assuming request.user is the sender (UserAccount instance)
-            send_by=request.user,
-            # Fetch the Doctor instance by ID
-            sent_to=get_object_or_404(Doctor, user_id=doctor_id),
-            message=notification['message'],
-            is_seen=False  # Assuming the default value for is_seen is False
-        )
+            # Send a notification to the superuser using channels
+            async_to_sync(channel_layer.group_send)(
+                'superuser_group', notification)
 
-        return Response(serializer.data)
+            # Save the booking notification to the database
+            booking_notification = Booking_Notification.objects.create(
+                send_by=request.user,
+                sent_to=get_object_or_404(Doctor, user_id=doctor_id),
+                message=notification['message'],
+                is_seen=False
+            )
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        else:
+            return Response({'message': 'Slot is already booked.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -143,19 +157,45 @@ class DoctorBookinNotificationAPiView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, doctor_id):
-        objects = Booking_Notification.objects.filter(sent_to_id=doctor_id).order_by('-time')
-        serializer = BookingNotificationSerializer(objects, many=True)  
-        return Response(serializer.data)
+        try:
+            objects = Booking_Notification.objects.filter(sent_to_id=doctor_id).order_by('-time')
+            serializer = BookingNotificationSerializer(objects, many=True)
+            return Response(serializer.data)
+        except Booking_Notification.DoesNotExist:
+            return Response({"detail": "No notifications found for the specified doctor."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": "An error occurred while processing the request."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     
 class AdminBookingNotificationAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    
-    def get(self,request):
-        if request.user.is_superuser:
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        try:
             objects = Booking_Notification.objects.all().order_by('-time')
-            serializers = BookingNotificationSerializer(objects,many = True)
-            return Response(serializers.data)
-        else:
-            pass
+            serializer = BookingNotificationSerializer(objects, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            # Handle any unexpected exceptions and return a generic error response
+            return Response({"detail": "An error occurred while processing the request."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class GetDashboardSlotsListAPIView(APIView):
+    permission_classes = []
+
+    def get(self, request, doctor_id):
+        object = Slots.objects.filter(doctor=doctor_id).order_by('id')
+        serializer = GetDashboardSlotSerializer(object, many=True)
+        return Response(serializer.data)
+    
+class GetAppointmentAPIView(APIView):
+    permission_classes = []
+
+    def get(self, request, doctor_id):
+        object = Appointment.objects.filter(doctor=doctor_id).order_by('id')
+        serializer = GetAppointmentSerializer(object, many=True)
+        return Response(serializer.data)
