@@ -114,12 +114,12 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'postgres://advanzclinic_user:Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK@dpg-cj9nebe3ttrc73b55vgg-a/advanzclinic',
-        'NAME': 'advanzclinic',
-        'USER': 'advanzclinic_user',
-        'PASSWORD': 'Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK',
-        'HOST': 'dpg-cj9nebe3ttrc73b55vgg-a',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        "TEST": {
+            "NAME": BASE_DIR / "db.sqlite3",
+        },
     }
 }
 
