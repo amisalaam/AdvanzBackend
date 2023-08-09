@@ -6,9 +6,10 @@ from .routing import websocket_urlpatterns
 
 urlpatterns = [
     path('api/details/', GetDoctorListAPIView.as_view(), name='doctor_details'),
-    path('api/create/slots/', CreateSlotsAPIView.as_view(), name='create_slots'),
     
+    path('api/create/slots/', CreateSlotsAPIView.as_view(), name='create_slots'),
     path('api/get/doctor/notification/<int:doctor_id>/', DoctorBookinNotificationAPiView.as_view(), name='doctor_notification'),
+    
     path('api/get/admin/notification/', AdminBookingNotificationAPIView.as_view(), name='admin_notification'),
     path('api/get/slots/<int:doctor_id>/', GetSlotsListAPIView.as_view(), name='get_slots'),
     path('api/get/dashboard/slots/<int:doctor_id>/', GetDashboardSlotsListAPIView.as_view(), name='get_slots'),
