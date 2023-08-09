@@ -95,8 +95,8 @@ TEMPLATES = [
 ]
 
 
+ASGI_APPLICATION = 'advanzBackend.asgi.application'            
 WSGI_APPLICATION = 'advanzBackend.wsgi.application'
-ASGI_APPLICATION = 'advanzBackend.asgi.application'  
 
 CHANNEL_LAYERS = {
     "default": {
