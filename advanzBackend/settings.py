@@ -115,11 +115,11 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'postgres://advanzclinic_user:Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK@dpg-cj9nebe3ttrc73b55vgg-a.oregon-postgres.render.com/advanzclinic',
         'NAME': 'advanzclinic',
-        'USER': 'postgres',
-        'PASSWORD': 'ameen2811',
-        'HOST': 'localhost',
+        'USER': 'advanzclinic_user',
+        'PASSWORD': 'Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK',
+        'HOST': 'dpg-cj9nebe3ttrc73b55vgg-a',
     }
 }
 
