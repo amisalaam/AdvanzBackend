@@ -115,7 +115,7 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'postgres://advanzclinic_user:Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK@dpg-cj9nebe3ttrc73b55vgg-a.oregon-postgres.render.com/advanzclinic',
+        'ENGINE': 'postgres://advanzclinic_user:Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK@dpg-cj9nebe3ttrc73b55vgg-a/advanzclinic',
         'NAME': 'advanzclinic',
         'USER': 'advanzclinic_user',
         'PASSWORD': 'Tnz5dpVWiM5c5EkQnO4XllopaiZkzhHK',
