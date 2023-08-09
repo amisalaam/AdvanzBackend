@@ -70,6 +70,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'https://advnaz-forntend.vercel.app',
     
 ]
 
@@ -216,6 +217,6 @@ DJOSER = {
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
 
     },
-    'SITE_DOMAIN': 'http://localhost:5173'
+    
 
 }
