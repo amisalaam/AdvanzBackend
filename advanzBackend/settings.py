@@ -72,6 +72,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'https://advnaz-forntend.vercel.app',
     'https://advnaz-forntend-fi3t64at0-amisalaam.vercel.app',
+    'https://advnaz-forntend-mwby0m7ck-amisalaam.vercel.app',
+    
     
 ]
 
