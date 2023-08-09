@@ -73,6 +73,21 @@ class GetAppointmentSerializer(serializers.ModelSerializer):
         model =Appointment
         fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','status','patient_name']
         
-        
+
+
+class GetUserAppointmentSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(source='doctor.user.name',read_only=True)
+    patient_name = serializers.CharField(source='patient.name',read_only=True)
+    doctor_email = serializers.CharField(source='doctor.user.email',read_only=True)
+    doctor_image = serializers.ImageField(source='doctor.doctor_profile_image', read_only=True)
+    start_time = serializers.TimeField(source = 'slot.start_time',read_only=True,format='%H:%M')
+    end_time = serializers.TimeField(source = 'slot.end_time',read_only=True,format='%H:%M')
+    date = serializers.TimeField(source = 'slot.date',read_only=True)
     
+    class Meta:
+        model =Appointment
+        fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','status','patient_name']
+    
+
+
     

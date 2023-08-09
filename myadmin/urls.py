@@ -13,4 +13,10 @@ urlpatterns = [
     path('api/get/all/department/',GetAllDepartmentAPIView.as_view(),name = 'admin_get_department_Users'),
     
     path('api/get/booked/slots/',GetBookedSlotsAPIView.as_view(),name = 'admin_get_department_Users'),
+    path('api/get/slots/all/doctor/', GetCreateSlotGetDoctorAPIView.as_view(), name='create_slots_getDoctors'),
+    path('api/cancel/or/book/slots/<int:slot_id>/', AdminCancelSlotsAPIView.as_view(), name='admin_cancel_or_book_slot'),
+    
+    
+    path('api/get/dashboard/appointment/', GetAdminAppointmentAPIView.as_view(), name='get_appointment'),
+    
 ]

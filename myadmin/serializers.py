@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from doctor.models import Doctor, Department,Slots
+from doctor.models import Doctor, Department,Slots,Appointment
 from authentication.models import UserAccount
 
 
@@ -75,3 +75,31 @@ class BookedSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slots
         fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','is_booked']
+
+
+class GetCreateSlotGetDoctorSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(source='user.name', read_only=True)
+    
+    class Meta:
+        model = Doctor
+        fields = ['user_id','doctor_name'] 
+
+
+class GetAppointmentSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(source='doctor.user.name',read_only=True)
+    patient_name = serializers.CharField(source='patient.name',read_only=True)
+    doctor_email = serializers.CharField(source='doctor.user.email',read_only=True)
+    doctor_image = serializers.ImageField(source='doctor.doctor_profile_image', read_only=True)
+    start_time = serializers.TimeField(source = 'slot.start_time',read_only=True,format='%H:%M')
+    end_time = serializers.TimeField(source = 'slot.end_time',read_only=True,format='%H:%M')
+    date = serializers.TimeField(source = 'slot.date',read_only=True)
+    
+    class Meta:
+        model =Appointment
+        fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','status','patient_name']
+        
+        
+class AdminCancelSlotsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Slots
+        fields = '__all__'

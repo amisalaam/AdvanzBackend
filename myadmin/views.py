@@ -6,8 +6,10 @@ from django.db import transaction
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import UpdateAPIView
+from rest_framework.permissions import IsAuthenticated 
 from rest_framework.response import Response
 from .serializers import *
+from doctor.models import Appointment
 
 # Create your views here.
 
@@ -174,8 +176,59 @@ class GetBookedSlotsAPIView(APIView):
 
     def get(self, request):
         try:
-            slots = Slots.objects.all()
+            slots = Slots.objects.all().order_by('id')
             serializer = BookedSlotSerializer(slots, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+
+class GetCreateSlotGetDoctorAPIView(APIView):
+    permission_classes = []
+    
+    def get(self, request):
+        try:
+            objects = Doctor.objects.all()
+            serializer = GetCreateSlotGetDoctorSerializer(objects, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            error_message = str(e)
+            return Response({'error': error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GetAdminAppointmentAPIView(APIView):
+    permission_classes = []
+
+    def get(self, request):
+        object = Appointment.objects.all().order_by('id')
+        serializer = GetAppointmentSerializer(object, many=True)
+        return Response(serializer.data)
+
+class AdminCancelSlotsAPIView(APIView):
+    permission_classes = []
+
+    def patch(self, request, slot_id):
+        try:
+            slot = Slots.objects.get(pk=slot_id)
+        except Slots.DoesNotExist as e:
+            print(f"Error: Slot with ID {slot_id} does not exist. {e}")
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if slot.is_booked:
+            try:
+                slot.is_booked = False
+                slot.save()
+
+                appointment = Appointment.objects.filter(slot=slot).first()
+                if appointment:
+                    appointment.status = 'blocked'
+                    appointment.save()
+
+                serializer = AdminCancelSlotsSerializer(slot)  
+                return Response(serializer.data)
+            except Exception as e:
+                print(f"Error: An error occurred while canceling the booking. {e}")
+                return Response({'message': 'An error occurred while canceling the booking.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'message': 'The slot is not booked, so it cannot be canceled.'}, status=status.HTTP_400_BAD_REQUEST)

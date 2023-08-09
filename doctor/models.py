@@ -43,15 +43,15 @@ class Slots(models.Model):
     def __str__(self):
      return str(self.doctor) + " " + str(self.start_time) +" " +str(self.end_time)
 
-
 class Appointment(models.Model):
     patient = models.ForeignKey(UserAccount,on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor,on_delete=models.CASCADE)
     STATUS_CHOICES =(('pending','Pending'),
                      ('approved','Approved'),
                      ('completed','Completed'),
+                     ('cancelled','Cancelled'),
                      ('rejected','Rejected'),
-                     
+                     ('blocked','Blocked'),
                      )
     status = models.CharField(max_length=10,choices= STATUS_CHOICES,default='Pending')
     slot = models.ForeignKey(Slots,on_delete=models.CASCADE)

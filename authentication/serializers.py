@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserAccount
-from doctor.models import Doctor,Department
+from doctor.models import Doctor,Department,Appointment
 User = get_user_model()
 
 
@@ -40,8 +40,15 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = ['department', 'doctor_profile_image']
 
         
-        
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'  
 
 
+class CancelUserAppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__' 
 
 
