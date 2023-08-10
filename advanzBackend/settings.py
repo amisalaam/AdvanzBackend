@@ -98,12 +98,22 @@ TEMPLATES = [
 ASGI_APPLICATION = 'advanzBackend.asgi.application'            
 WSGI_APPLICATION = 'advanzBackend.wsgi.application'
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')],
         },
+        "ROUTING": "doctor.routing.websocket_urlpatterns",
     },
 }
 
