@@ -113,7 +113,6 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')],
         },
-        "ROUTING": "doctor.routing.websocket_urlpatterns",
     },
 }
 
