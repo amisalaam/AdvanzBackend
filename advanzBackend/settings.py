@@ -98,28 +98,15 @@ TEMPLATES = [
 ASGI_APPLICATION = 'advanzBackend.asgi.application'            
 WSGI_APPLICATION = 'advanzBackend.wsgi.application'
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
-#     },
-# }
-
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-
-
-# Update CHANNEL_LAYERS to use the environment variables
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(REDIS_HOST, REDIS_PORT)],
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
