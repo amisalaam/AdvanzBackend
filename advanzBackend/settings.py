@@ -109,7 +109,7 @@ WSGI_APPLICATION = 'advanzBackend.wsgi.application'
 
 REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)  # Set to None if not required
+
 
 # Update CHANNEL_LAYERS to use the environment variables
 CHANNEL_LAYERS = {
@@ -117,7 +117,6 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [(REDIS_HOST, REDIS_PORT)],
-            "password": REDIS_PASSWORD,
         },
     },
 }
