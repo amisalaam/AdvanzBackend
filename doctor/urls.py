@@ -17,5 +17,5 @@ urlpatterns = [
     path('api/get/user/appointment/<int:user_id>/', GetUserAppointmentAPIView.as_view(), name='get_user_appointment'),
     path('api/get/single/doctor/<int:doctor_id>/', GetSingleDoctorAPIView.as_view(), name='get_doctor'),
     path('api/update/slots/<int:slot_id>/<int:doctor_id>/', UpdateSlotListAPIView.as_view(), name='slot-update'),
-    path('wss/', include(websocket_urlpatterns)),
+    path('ws/', include(websocket_urlpatterns)),
 ]
