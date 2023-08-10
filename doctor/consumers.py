@@ -4,59 +4,82 @@ import json
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        doctor_id = self.scope['url_route']['kwargs']['doctor_id']
-        self.group_name = f'doctor_{doctor_id}'
+        try:
+            doctor_id = self.scope['url_route']['kwargs']['doctor_id']
+            self.group_name = f'doctor_{doctor_id}'
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
 
-        await self.accept()
+            await self.accept()
+        except Exception as e:
+            print("Error in connect:", e)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name
-        )
+        try:
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            print("Error in disconnect:", e)
 
     async def receive(self, text_data):
-        message = json.loads(text_data)
-        print("Received message:", message)
+        try:
+            message = json.loads(text_data)
+            print("Received message:", message)
+        except Exception as e:
+            print("Error in receive:", e)
 
     async def slot_booked(self, event):
-        message = event['message']
+        try:
+            message = event['message']
 
-        await self.send(json.dumps({
-            'type': 'slot_booked',
-            'message': message,
-        }))
+            await self.send(json.dumps({
+                'type': 'slot_booked',
+                'message': message,
+            }))
+        except Exception as e:
+            print("Error in slot_booked:", e)
 
 
 class SuperuserNotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.group_name = 'superuser_group'
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
-        await self.accept()
+        try:
+            self.group_name = 'superuser_group'
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+            print('connected ')
+            await self.accept()
+        except Exception as e:
+            print("Error in connect:", e)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name
-        )
+        try:
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            print("Error in disconnect:", e)
 
     async def receive(self, text_data):
-        message = json.loads(text_data)
-        print("admin_Received message:", message)
+        try:
+            message = json.loads(text_data)
+            print("admin_Received message:", message)
+        except Exception as e:
+            print("Error in receive:", e)
 
     async def slot_booked(self, event):
-        message = event['message']
-        await self.send(json.dumps({
-            'type': 'notification',
-            'message': message,
-            
-        }))
-
+        try:
+            message = event['message']
+            await self.send(json.dumps({
+                'type': 'notification',
+                'message': message,
+            }))
+        except Exception as e:
+            print("Error in slot_booked:", e)

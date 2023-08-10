@@ -57,8 +57,7 @@ INSTALLED_APPS = [
     'myadmin',
     'channels',
     'channels_redis',
-    
-    
+ 
 ]
 
 MIDDLEWARE = [
