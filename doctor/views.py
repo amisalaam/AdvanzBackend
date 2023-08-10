@@ -105,7 +105,7 @@ class GetSlotsListAPIView(APIView):
 
 
 class UpdateSlotListAPIView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def put(self, request, slot_id, doctor_id):
         slot_instance = get_object_or_404(Slots, id=slot_id)
@@ -127,25 +127,25 @@ class UpdateSlotListAPIView(APIView):
             )
 
             # Send a notification to the doctor using channels
-            channel_layer = get_channel_layer()
-            notification = {
-                'type': 'slot_booked',
-                'message': f'Slot {slot_id} has been booked by user {request.user}!',
-            }
-            async_to_sync(channel_layer.group_send)(
-                f'doctor_{doctor_id}', notification)
+            # channel_layer = get_channel_layer()
+            # notification = {
+            #     'type': 'slot_booked',
+            #     'message': f'Slot {slot_id} has been booked by user {request.user}!',
+            # }
+            # async_to_sync(channel_layer.group_send)(
+            #     f'doctor_{doctor_id}', notification)
 
-            # Send a notification to the superuser using channels
-            async_to_sync(channel_layer.group_send)(
-                'superuser_group', notification)
+            # # Send a notification to the superuser using channels
+            # async_to_sync(channel_layer.group_send)(
+            #     'superuser_group', notification)
 
-            # Save the booking notification to the database
-            booking_notification = Booking_Notification.objects.create(
-                send_by=request.user,
-                sent_to=get_object_or_404(Doctor, user_id=doctor_id),
-                message=notification['message'],
-                is_seen=False
-            )
+            # # Save the booking notification to the database
+            # booking_notification = Booking_Notification.objects.create(
+            #     send_by=request.user,
+            #     sent_to=get_object_or_404(Doctor, user_id=doctor_id),
+            #     message=notification['message'],
+            #     is_seen=False
+            # )
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
