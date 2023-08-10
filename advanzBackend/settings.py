@@ -55,8 +55,6 @@ INSTALLED_APPS = [
     'authentication',
     'doctor',
     'myadmin',
-    'channels',
-    'channels_redis',
  
 ]
 
@@ -98,23 +96,16 @@ TEMPLATES = [
 ASGI_APPLICATION = 'advanzBackend.asgi.application'            
 WSGI_APPLICATION = 'advanzBackend.wsgi.application'
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
-#     },
-# }
-
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')],
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
+
+
 
 
 # Database
