@@ -105,7 +105,7 @@ class GetSlotsListAPIView(APIView):
 
 
 class UpdateSlotListAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
     def put(self, request, slot_id, doctor_id):
         slot_instance = get_object_or_404(Slots, id=slot_id)
