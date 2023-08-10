@@ -103,7 +103,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("advanzbackend.onrender.com", 6379)],
         },
     },
 }
@@ -172,7 +172,6 @@ AUTH_USER_MODEL = 'authentication.UserAccount'
 
 # SMTP EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'advanzmedicalcenter1@gmail.com'
