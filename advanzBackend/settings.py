@@ -102,7 +102,10 @@ CHANNEL_LAYERS = {
 }
 
 ALLOWED_HOSTS = ['*']
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://www.advnazmedicalcenter.site",
+    "https://advanzbackend.onrender.com",
+]
 
 CORS_ALLOW_ALL_HEADERS = ['*']
 CORS_ALLOW_METHODS = ['*']
