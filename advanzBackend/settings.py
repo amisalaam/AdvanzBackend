@@ -28,16 +28,8 @@ SECRET_KEY = 'django-insecure-fyii%xl0ts0=&(s6u@a(4x9w_=fmheo44arocr--o!5$99y5$&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-# CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_ALL_HEADERS = ['*']
-CORS_ALLOW_METHODS = ['*']
 
-CORS_ALLOWED_ORIGINS = [
-    "https://www.advnazmedicalcenter.site",
-    
-]
 # Application definition
 
 INSTALLED_APPS = [
@@ -65,8 +57,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -108,6 +100,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_ALL_HEADERS = ['*']
+CORS_ALLOW_METHODS = ['*']
 
 
 
