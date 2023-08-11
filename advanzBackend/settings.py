@@ -29,12 +29,15 @@ SECRET_KEY = 'django-insecure-fyii%xl0ts0=&(s6u@a(4x9w_=fmheo44arocr--o!5$99y5$&
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_ALL_HEADERS = ['*']
-CORS_ALLOW_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+CORS_ALLOW_METHODS = ['*']
 
-
+CORS_ALLOWED_ORIGINS = [
+    "https://www.advnazmedicalcenter.site",
+    
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'corsheaders',
+    
 
     # CREATED APPS
     'authentication',
