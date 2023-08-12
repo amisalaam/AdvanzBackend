@@ -101,14 +101,18 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("advanzbackend.onrender.com", 6379)],
+            
+            
         },
     },
+        
 }
 
 CORS_ALLOWED_ORIGINS = [
     "https://www.advnazmedicalcenter.site",
-    'http://localhost:5173'
+    print('allowed aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    'http://localhost:5173',
  ]
 CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True
