@@ -99,11 +99,11 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-            
+            "hosts": ["redis://red-cjbkv745kgrc73apn3c0:6379"],
         },
     },
 }
+
 CORS_ALLOWED_ORIGINS = [
     "https://www.advnazmedicalcenter.site",
     'http://localhost:5173'

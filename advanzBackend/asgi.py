@@ -37,7 +37,7 @@ class RedisCheckMiddleware:
 # Define the application routing
 application = ProtocolTypeRouter(
     {
-        "https": RedisCheckMiddleware(django_asgi_application, channel_layer),
+        "http": RedisCheckMiddleware(django_asgi_application, channel_layer),
         "websocket": AllowedHostsOriginValidator(AuthMiddlewareStack(
             URLRouter(routing.websocket_urlpatterns))
         ),
