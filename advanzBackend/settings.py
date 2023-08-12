@@ -101,8 +101,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("advanzbackend.onrender.com", 6379),print('allowed aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')],
-            
+            "hosts": [("127.0.0.1", 6379)],
             
         },
     },

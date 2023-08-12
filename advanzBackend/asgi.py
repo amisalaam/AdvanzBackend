@@ -9,7 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "advanzBackend.settings")
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "https": get_asgi_application(),
         "websocket":AllowedHostsOriginValidator( AuthMiddlewareStack(
             URLRouter(routing.websocket_urlpatterns))
         ),
