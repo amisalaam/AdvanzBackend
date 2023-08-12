@@ -56,7 +56,7 @@ class SuperuserNotificationConsumer(AsyncWebsocketConsumer):
             print('connected ')
             await self.accept()
         except Exception as e:
-            print("Error in connect:", e)
+            print("Error in connect 77777777777777777777777777777777777777777777777:", e)
 
     async def disconnect(self, close_code):
         try:
@@ -65,14 +65,14 @@ class SuperuserNotificationConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
         except Exception as e:
-            print("Error in disconnect:", e)
+            print("Error in disconnect: 66666666666666666666666666666666", e)
 
     async def receive(self, text_data):
         try:
             message = json.loads(text_data)
             print("admin_Received message:", message)
         except Exception as e:
-            print("Error in receive:", e)
+            print("Error in receive:55555555555555555555555555", e)
 
     async def slot_booked(self, event):
         try:
@@ -82,4 +82,4 @@ class SuperuserNotificationConsumer(AsyncWebsocketConsumer):
                 'message': message,
             }))
         except Exception as e:
-            print("Error in slot_booked:", e)
+            print("Error in slot_booked:4444444444444444444444444444444444", e)
