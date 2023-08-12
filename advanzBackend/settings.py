@@ -95,15 +95,21 @@ TEMPLATES = [
 ASGI_APPLICATION = 'advanzBackend.asgi.application'            
 WSGI_APPLICATION = 'advanzBackend.wsgi.application'
 
+REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
+REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+print("REDIS_HOST:", REDIS_HOST)
+print("REDIS_PORT:", REDIS_PORT)
+
+# Define the CHANNEL_LAYERS configuration using the Redis host and port
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-            "LOCATION": "redis://redis-kufk:10000",
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
+print("Hosts:", [(f"redis://{REDIS_HOST}:{REDIS_PORT}",)])
 CORS_ALLOWED_ORIGINS = [
     "https://www.advnazmedicalcenter.site",
     'http://localhost:5173'
