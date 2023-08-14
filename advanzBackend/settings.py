@@ -109,8 +109,8 @@ CHANNEL_LAYERS = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "https://www.advnazmedicalcenter.site",
-    'http://localhost:5173'
+    'http://localhost:5173',
+    "https://www.advnazmedicalcenter.site"
  ]
 CORS_ALLOW_ALL_HEADERS = True
 CORS_ALLOW_ALL_METHODS = True

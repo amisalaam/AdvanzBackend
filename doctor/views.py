@@ -126,18 +126,18 @@ class UpdateSlotListAPIView(APIView):
                 slot=slot_instance
             )
 
-            # Send a notification to the doctor using channels
-            channel_layer = get_channel_layer()
+            # # Send a notification to the doctor using channels
+            # channel_layer = get_channel_layer()
             notification = {
                 'type': 'slot_booked',
                 'message': f'Slot {slot_id} has been booked by user {request.user}!',
             }
-            async_to_sync(channel_layer.group_send)(
-                f'doctor_{doctor_id}', notification)
+            # async_to_sync(channel_layer.group_send)(
+            #     f'doctor_{doctor_id}', notification)
 
-            # Send a notification to the superuser using channels
-            async_to_sync(channel_layer.group_send)(
-                'superuser_group', notification)
+            # # Send a notification to the superuser using channels
+            # async_to_sync(channel_layer.group_send)(
+            #     'superuser_group', notification)
 
             # Save the booking notification to the database
             booking_notification = Booking_Notification.objects.create(
