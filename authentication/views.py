@@ -27,27 +27,26 @@ class GetAllUserAPIView(APIView):
 
 # USERDASHBOARD FUNCTION
 
+
 class CancelUserAppointmentAPIView(APIView):
     permission_classes = []
+    
+    def put(self, request, appointment_id, user_id):
+        try:
+            appointment = Appointment.objects.get(pk=appointment_id, patient_id=user_id)
+        except Appointment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request,appointment_id):
-        
-        serializer = CancelUserAppointmentSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if appointment.status == 'Approved':
+            return Response({"message": "Only Approved appointments can be canceled."}, status=status.HTTP_400_BAD_REQUEST)
 
-        appointment = get_object_or_404(
-            Appointment, id=appointment_id, patient=23)
-
-        if appointment.status == 'approved':
-            # Update appointment status to 'pending'
-            appointment.status = 'cancelled'
-            appointment.save()
-
-            # Update the associated slot's booking status
-            slot = appointment.slot
+        slot = appointment.slot
+        if slot.is_booked:
             slot.is_booked = False
             slot.save()
 
-            return Response({'message': 'Slot booking has been canceled successfully.'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': 'Cannot cancel the slot as it is not in an approved state.'}, status=status.HTTP_400_BAD_REQUEST)
+        appointment.status = 'cancelled'
+        appointment.save()
+
+        serializer = CancelUserAppointmentSerializer(appointment)
+        return Response(serializer.data)
