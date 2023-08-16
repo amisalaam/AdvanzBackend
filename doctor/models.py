@@ -66,8 +66,14 @@ class Booking_Notification(models.Model):
     def __str__(self):
         return f"{self.send_by.name}: {self.message}"
     
-
+class Services(models.Model):
+    image = models.ImageField(upload_to='images/doctor/serivces/')
+    heading = models.CharField(max_length=20)
+    description = models.CharField(max_length=100)
     
+    def __str__(self):
+        return self.heading
+
     
 
 

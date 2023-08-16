@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Doctor,Slots,Booking_Notification,Appointment
+from .models import Doctor,Slots,Booking_Notification,Appointment,Services
 
 
 
@@ -90,4 +90,7 @@ class GetUserAppointmentSerializer(serializers.ModelSerializer):
     
 
 
-    
+class GetServicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Services
+        fields = '__all__'

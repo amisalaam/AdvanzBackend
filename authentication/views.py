@@ -19,8 +19,11 @@ def Login(request):
 
 
 class GetAllUserAPIView(APIView):
+    
+    
     def get(self, request):
         user = request.user
+        
         serializer = GetAllUserSerializer(user)
         return Response(serializer.data)
 

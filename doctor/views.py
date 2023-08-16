@@ -19,7 +19,6 @@ class GetDoctorListAPIView(APIView):
 
     def get(self, request):
         doctor = Doctor.objects.all()
-        print(doctor)
         serializer = DoctorGetDetailsSerializer(doctor, many=True)
         serialized_data = serializer.data
         for data in serialized_data:
@@ -35,7 +34,6 @@ class GetSingleDoctorAPIView(APIView):
 
     def get(self, request, doctor_id):
         doctor = Doctor.objects.get(user_id=doctor_id)
-        print(doctor)
         serializer = GetSingleDoctorSerializer(doctor)
         serialized_data = serializer.data
 
@@ -88,7 +86,7 @@ class CreateSlotsAPIView(APIView):
                     date, current_time)+datetime.timedelta(minutes=slot_duration)).time()
             Slots.objects.bulk_create(slots)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
+        
     
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -211,4 +209,12 @@ class GetUserAppointmentAPIView(APIView):
         
         appointments = Appointment.objects.filter(patient_id=user_id)
         serializer = GetUserAppointmentSerializer(appointments, many=True)
+        return Response(serializer.data)
+    
+
+class GetServicesView(APIView):
+    permission_classes = []
+    def get(self, request):
+        services = Services.objects.all()
+        serializer = GetServicesSerializer(services, many=True)
         return Response(serializer.data)
