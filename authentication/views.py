@@ -53,3 +53,26 @@ class CancelUserAppointmentAPIView(APIView):
 
         serializer = CancelUserAppointmentSerializer(appointment)
         return Response(serializer.data)
+    
+#DASHBOARD
+
+class PatientAppointmentDataAPIView(APIView):
+    permission_classes = []
+    
+    def get(self, request, user_id, format=None):
+        patient = get_object_or_404(UserAccount, id=user_id)
+        approved_appointment_count = Appointment.objects.filter(patient=patient, status='approved').count()
+        blocked_appointment_count = Appointment.objects.filter(patient=patient, status='blocked').count()
+        rejected_appointment_count = Appointment.objects.filter(patient=patient, status='rejected').count()
+        cancelled_appointment_count = Appointment.objects.filter(patient=patient, status='cancelled').count()
+
+        data = {
+            'patient_name': patient.name,
+            'approved_appointment_count': approved_appointment_count,
+            'blocked_appointment_count': blocked_appointment_count,
+            'rejected_appointment_count': rejected_appointment_count,
+            'cancelled_appointment_count': cancelled_appointment_count,
+        }
+
+        serializer = PatientAppointmentDataSerializer(data)
+        return Response(serializer.data)

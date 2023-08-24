@@ -218,3 +218,45 @@ class GetServicesView(APIView):
         services = Services.objects.all()
         serializer = GetServicesSerializer(services, many=True)
         return Response(serializer.data)
+
+
+class AppointmentStatusUpdateView(APIView):
+    permission_classes = []
+
+    def patch(self, request, appointment_id):
+        appointment = get_object_or_404(Appointment, pk=appointment_id)
+
+        if appointment.status == 'approved' and appointment.slot.is_booked:
+            appointment.slot.is_booked = False
+            appointment.slot.save()
+
+            appointment.status = 'rejected'
+            appointment.save()
+
+            return Response({'message': 'Appointment status changed to rejected and slot is freed.'}, status=status.HTTP_200_OK)
+        else:
+            
+            return Response({'message': 'Appointment cannot be rejected.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# DASHBOARD
+
+class DoctorAppointmentCountAPIView(APIView):
+    permission_classes = []
+    
+    def get(self, request, user_id, format=None):
+        doctor = get_object_or_404(Doctor, user__id=user_id)
+        appointment_count = Appointment.objects.filter(doctor=doctor).count()
+        slot_count = Slots.objects.filter(doctor=doctor).count()
+        approved_appointment_count = Appointment.objects.filter(doctor=doctor, status='approved').count()
+
+        data = {
+            'doctor_name': doctor.user.name,
+            'appointment_count': appointment_count,
+            'slot_count': slot_count,
+            'approved_appointment_count': approved_appointment_count,
+            
+        }
+
+        serializer = DoctorAppointmentCountSerializer(data)
+        return Response(serializer.data)

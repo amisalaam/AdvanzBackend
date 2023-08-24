@@ -6,7 +6,7 @@ from django.db import transaction
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import UpdateAPIView
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .serializers import *
 from doctor.models import Appointment
@@ -41,14 +41,31 @@ class GetAllDoctorAPIView(APIView):
 
 
 class CreateDoctorAPIView(APIView):
-    permission_classes = []  
+    permission_classes = []
 
     def post(self, request):
         serializer = DoctorCreateSerializer(data=request.data)
         try:
             if serializer.is_valid():
                 user = serializer.save()
-                return Response({'message': 'Doctor account created successfully.'}, status=status.HTTP_201_CREATED)
+
+                # Create the doctor_data dictionary with necessary fields
+                doctor_data = {
+                    'department': {
+                        'department_name': user.doctor.department.department_name,
+                        'id': user.doctor.department.id,
+                    },
+                    'doctor_profile_image': user.doctor.doctor_profile_image.url if user.doctor.doctor_profile_image else None,
+                    'user': {
+                        'email': user.email,
+                        'id': user.id,
+                        'name': user.name,
+                        'is_active': user.is_active,
+                        'is_doctor': user.is_doctor,
+                    }
+                }
+
+                return Response(doctor_data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -145,32 +162,31 @@ class EditDoctorProfileView(APIView):
             'user': EditDoctorUserAccountSerializer(user_instance).data,
             'doctor': EditDoctorSerializer(doctor).data if doctor else None
         })
-        
-        
+
+
 class BlockUsersView(APIView):
     permission_classes = []
-    
+
     def patch(self, request, user_id):
         try:
             user = get_object_or_404(UserAccount, id=user_id, is_doctor=False)
-            user.is_active = not user.is_active  
+            user.is_active = not user.is_active
             user.save()
-            
+
             if user.is_active:
                 message = 'User is now active.'
             else:
                 message = 'User is now blocked.'
-            
+
             return Response({'message': message}, status=status.HTTP_200_OK)
 
         except UserAccount.DoesNotExist:
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    
-    
+
+
 class GetBookedSlotsAPIView(APIView):
     permission_classes = []
 
@@ -181,12 +197,11 @@ class GetBookedSlotsAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        
+
 
 class GetCreateSlotGetDoctorAPIView(APIView):
     permission_classes = []
-    
+
     def get(self, request):
         try:
             objects = Doctor.objects.all()
@@ -204,6 +219,7 @@ class GetAdminAppointmentAPIView(APIView):
         object = Appointment.objects.all().order_by('id')
         serializer = GetAppointmentSerializer(object, many=True)
         return Response(serializer.data)
+
 
 class AdminCancelSlotsAPIView(APIView):
     permission_classes = []
@@ -225,10 +241,78 @@ class AdminCancelSlotsAPIView(APIView):
                     appointment.status = 'blocked'
                     appointment.save()
 
-                serializer = AdminCancelSlotsSerializer(slot)  
+                serializer = AdminCancelSlotsSerializer(slot)
                 return Response(serializer.data)
             except Exception as e:
-                print(f"Error: An error occurred while canceling the booking. {e}")
+                print(
+                    f"Error: An error occurred while canceling the booking. {e}")
                 return Response({'message': 'An error occurred while canceling the booking.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({'message': 'The slot is not booked, so it cannot be canceled.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DepartmentCreate(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        serializer = GetAllDepartmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class DepartmentDelete(APIView):
+    permission_classes = []
+
+    def delete(self, request, department_id):
+        department = get_object_or_404(Department, pk=department_id)
+        department.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class AppointmentStatusUpdateView(APIView):
+    permission_classes = []
+
+    def patch(self, request, appointment_id):
+        appointment = get_object_or_404(Appointment, pk=appointment_id)
+
+        if appointment.status == 'approved' and appointment.slot.is_booked:
+            appointment.slot.is_booked = False
+            appointment.slot.save()
+
+            appointment.status = 'blocked'
+            appointment.save()
+
+            return Response({'message': 'Appointment status changed to blocked and slot is freed.'}, status=status.HTTP_200_OK)
+        else:
+            
+            return Response({'message': 'Appointment cannot be blocked.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#DASHBOARD 
+
+class DoctorCountAPIView(APIView):
+    permission_classes = []
+    
+    def get(self, request, format=None):
+        doctors_count = Doctor.objects.count()
+
+        serializer = DoctorCountSerializer({'doctors_count': doctors_count})
+        return Response(serializer.data)
+
+class PatientCountAPIView(APIView):
+    permission_classes = []
+    
+    def get(self, request, format=None):
+        patients_count = UserAccount.objects.filter(is_superuser=False, is_doctor=False).count()
+        serializer = PatinetCountSerializer({'patients_count': patients_count})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class AppointmentCountView(APIView):
+    permission_classes = []
+    
+    def get(self, request, format=None):
+        appointment_count = Appointment.objects.count()
+        serializer = AppointmentCountSerializer({'appointment_count': appointment_count})
+        return Response(serializer.data)

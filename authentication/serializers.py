@@ -50,5 +50,14 @@ class CancelUserAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = '__all__' 
+        
+#DASHBOARD
+
+class PatientAppointmentDataSerializer(serializers.Serializer):
+    patient_name = serializers.CharField()
+    approved_appointment_count = serializers.IntegerField()
+    blocked_appointment_count = serializers.IntegerField()
+    rejected_appointment_count = serializers.IntegerField()
+    completed_appointment_count = serializers.IntegerField()
 
 

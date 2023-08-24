@@ -93,13 +93,28 @@ class GetAppointmentSerializer(serializers.ModelSerializer):
     start_time = serializers.TimeField(source = 'slot.start_time',read_only=True,format='%H:%M')
     end_time = serializers.TimeField(source = 'slot.end_time',read_only=True,format='%H:%M')
     date = serializers.TimeField(source = 'slot.date',read_only=True)
+    department = serializers.CharField(source='doctor.department.department_name',read_only=True)
+    
     
     class Meta:
         model =Appointment
-        fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','status','patient_name']
+        fields = ['id', 'doctor_name', 'doctor_image', 'date', 'start_time', 'end_time','doctor_email','status','patient_name','department']
         
         
 class AdminCancelSlotsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Slots
         fields = '__all__'
+        
+
+#DASHBOARD
+
+class DoctorCountSerializer(serializers.Serializer):
+    doctors_count = serializers.IntegerField()
+    
+
+class PatinetCountSerializer(serializers.Serializer):
+    patients_count = serializers.IntegerField()
+
+class AppointmentCountSerializer(serializers.Serializer):
+    appointment_count = serializers.IntegerField()

@@ -94,3 +94,13 @@ class GetServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Services
         fields = '__all__'
+
+
+#DASHBOARD
+
+class DoctorAppointmentCountSerializer(serializers.Serializer):
+    doctor_name = serializers.CharField()
+    appointment_count = serializers.IntegerField()
+    slot_count = serializers.IntegerField()
+    approved_appointment_count = serializers.IntegerField()
+    
