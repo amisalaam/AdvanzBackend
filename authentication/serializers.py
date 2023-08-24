@@ -58,6 +58,6 @@ class PatientAppointmentDataSerializer(serializers.Serializer):
     approved_appointment_count = serializers.IntegerField()
     blocked_appointment_count = serializers.IntegerField()
     rejected_appointment_count = serializers.IntegerField()
-    completed_appointment_count = serializers.IntegerField()
+    cancelled_appointment_count = serializers.IntegerField()
 
 
