@@ -204,6 +204,9 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
+DOMAIN = "advnazmedicalcenter.site"
+SITE_NAME = "Advnaz Medical Center "
+
 DJOSER = {
     'USER_AUTHENTICATION': 'authentication.UserAccount',
     'LOGIN_FIELD': 'email',
